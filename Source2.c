@@ -3,15 +3,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define BLOCK_SIZE 16 // Размер блока 16 байт (или 128 бит)
+#define BLOCK_SIZE 16 // Р Р°Р·РјРµСЂ Р±Р»РѕРєР° 16 Р±Р°Р№С‚ (РёР»Рё 128 Р±РёС‚)
 
-typedef uint8_t vect[BLOCK_SIZE]; // Определяем тип vect как 16-байтовый массив
+typedef uint8_t vect[BLOCK_SIZE]; // РћРїСЂРµРґРµР»СЏРµРј С‚РёРї vect РєР°Рє 16-Р±Р°Р№С‚РѕРІС‹Р№ РјР°СЃСЃРёРІ
 
 extern void GOST_Kuz_reverse_R(uint8_t* state);
 
 vect iter_C[32];
 
-//сложение по модулю 2
+//СЃР»РѕР¶РµРЅРёРµ РїРѕ РјРѕРґСѓР»СЋ 2
 static void GOST_Kuz_X(const uint8_t* a, const uint8_t* b, uint8_t* c)
 {
     int i;
@@ -19,7 +19,7 @@ static void GOST_Kuz_X(const uint8_t* a, const uint8_t* b, uint8_t* c)
         c[i] = a[i] ^ b[i];
 }
 
-//массив S - преобразований
+//РјР°СЃСЃРёРІ S - РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёР№
 static const unsigned char Pi[256] = {
     0xFC, 0xEE, 0xDD, 0x11, 0xCF, 0x6E, 0x31, 0x16,
     0xFB, 0xC4, 0xFA, 0xDA, 0x23, 0xC5, 0x04, 0x4D,
@@ -55,7 +55,7 @@ static const unsigned char Pi[256] = {
     0xD1, 0x66, 0xAF, 0xC2, 0x39, 0x4B, 0x63, 0xB6
 };
 
-//функция преобразования S
+//С„СѓРЅРєС†РёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ S
 static void GOST_Kuz_S(const uint8_t* in_data, uint8_t* out_data)
 {
     int i;
@@ -63,7 +63,7 @@ static void GOST_Kuz_S(const uint8_t* in_data, uint8_t* out_data)
         out_data[i] = Pi[in_data[i]];
 }
 
-//массив обратного преобразования S
+//РјР°СЃСЃРёРІ РѕР±СЂР°С‚РЅРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ S
 static const unsigned char reverse_Pi[256] = {
     0xA5, 0x2D, 0x32, 0x8F, 0x0E, 0x30, 0x38, 0xC0,
     0x54, 0xE6, 0x9E, 0x39, 0x55, 0x7E, 0x52, 0x91,
@@ -99,7 +99,7 @@ static const unsigned char reverse_Pi[256] = {
     0xD6, 0x20, 0x0A, 0x08, 0x00, 0x4C, 0xD7, 0x74
 };
 
-//обратное преобразование S
+//РѕР±СЂР°С‚РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ S
 static void GOST_Kuz_reverse_S(const uint8_t* in_data, uint8_t* out_data)
 {
     int i;
@@ -107,8 +107,8 @@ static void GOST_Kuz_reverse_S(const uint8_t* in_data, uint8_t* out_data)
         out_data[i] = reverse_Pi[in_data[i]];
 }
 
-//для линейного преобразования 
-//функция умножения чисел в поле Галуа над неприводимым полиномом x^8 + x^7 + x^6 + x + 1
+//РґР»СЏ Р»РёРЅРµР№РЅРѕРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ 
+//С„СѓРЅРєС†РёСЏ СѓРјРЅРѕР¶РµРЅРёСЏ С‡РёСЃРµР» РІ РїРѕР»Рµ Р“Р°Р»СѓР° РЅР°Рґ РЅРµРїСЂРёРІРѕРґРёРјС‹Рј РїРѕР»РёРЅРѕРјРѕРј x^8 + x^7 + x^6 + x + 1
 static uint8_t GOST_Kuz_GF_mul(uint8_t a, uint8_t b)
 {
     uint8_t c = 0;
@@ -121,19 +121,19 @@ static uint8_t GOST_Kuz_GF_mul(uint8_t a, uint8_t b)
         hi_bit = a & 0x80;
         a <<= 1;
         if (hi_bit)
-            a ^= 0xc3; // Полином x^8 + x^7 + x^6 + x + 1
+            a ^= 0xc3; // РџРѕР»РёРЅРѕРј x^8 + x^7 + x^6 + x + 1
         b >>= 1;
     }
     return c;
 }
 
-//массив коэффициентов дляпреобразования R
+//РјР°СЃСЃРёРІ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ РґР»СЏРїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ R
 static const unsigned char l_vec[16] = {
     1, 148, 32, 133, 16, 194, 192, 1,
     251, 1, 192, 194, 16, 133, 32, 148
 };
 
-//функция преобразования R
+//С„СѓРЅРєС†РёСЏ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ R
 static void GOST_Kuz_R(uint8_t* state)
 {
     int i;
@@ -141,15 +141,15 @@ static void GOST_Kuz_R(uint8_t* state)
     vect internal;
     for (i = 15; i >= 0; i--)
     {
-        internal[i - 1] = state[i];// Двигаем байты в сторону младшего разряда
+        internal[i - 1] = state[i];// Р”РІРёРіР°РµРј Р±Р°Р№С‚С‹ РІ СЃС‚РѕСЂРѕРЅСѓ РјР»Р°РґС€РµРіРѕ СЂР°Р·СЂСЏРґР°
         a_15 ^= GOST_Kuz_GF_mul(state[i], l_vec[i]);
     }
-    // Пишем в последний байт результат сложения
+    // РџРёС€РµРј РІ РїРѕСЃР»РµРґРЅРёР№ Р±Р°Р№С‚ СЂРµР·СѓР»СЊС‚Р°С‚ СЃР»РѕР¶РµРЅРёСЏ
     internal[15] = a_15;
     memcpy(state, internal, BLOCK_SIZE);
 }
 
-//Линейное преобразование L, которое обрразуется путем 16 кратного повторения GOST_Kuz_R (сдвиг регистра 16 раз)
+//Р›РёРЅРµР№РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ L, РєРѕС‚РѕСЂРѕРµ РѕР±СЂСЂР°Р·СѓРµС‚СЃСЏ РїСѓС‚РµРј 16 РєСЂР°С‚РЅРѕРіРѕ РїРѕРІС‚РѕСЂРµРЅРёСЏ GOST_Kuz_R (СЃРґРІРёРі СЂРµРіРёСЃС‚СЂР° 16 СЂР°Р·)
 static void GOST_Kuz_L(const uint8_t* in_data, uint8_t* out_data)
 {
     int i;
@@ -160,7 +160,7 @@ static void GOST_Kuz_L(const uint8_t* in_data, uint8_t* out_data)
     memcpy(out_data, internal, BLOCK_SIZE);
 }
 
-//Обратное линейное преобразование 
+//РћР±СЂР°С‚РЅРѕРµ Р»РёРЅРµР№РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ 
 static void GOST_Kuz_reverse_L(const uint8_t* in_data, uint8_t* out_data)
 {
     int i;
@@ -171,7 +171,7 @@ static void GOST_Kuz_reverse_L(const uint8_t* in_data, uint8_t* out_data)
     memcpy(out_data, internal, BLOCK_SIZE);
 }
 
-//Обратное преобразование R
+//РћР±СЂР°С‚РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ R
 static void GOST_Kuz_reverse_R(uint8_t* state)
 {
     int i;
@@ -180,7 +180,7 @@ static void GOST_Kuz_reverse_R(uint8_t* state)
     vect internal;
     for (i = 0; i < 16; i++)
     {
-        internal[i] = state[i - 1];// Двигаем все на старые места
+        internal[i] = state[i - 1];// Р”РІРёРіР°РµРј РІСЃРµ РЅР° СЃС‚Р°СЂС‹Рµ РјРµСЃС‚Р°
         a_0 ^= GOST_Kuz_GF_mul(internal[i], l_vec[i]);
     }
     internal[0] = a_0;
@@ -188,7 +188,7 @@ static void GOST_Kuz_reverse_R(uint8_t* state)
 }
 
 
-//Ключи
+//РљР»СЋС‡Рё
 static void
 GOST_Kuz_Get_C()
 {
@@ -202,7 +202,7 @@ GOST_Kuz_Get_C()
     for (i = 0; i < 32; i++)
         GOST_Kuz_L(iter_num[i], iter_C[i]);
 }
-//функция, которая представляет одну итерацию развертывания ключа
+//С„СѓРЅРєС†РёСЏ, РєРѕС‚РѕСЂР°СЏ РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ РѕРґРЅСѓ РёС‚РµСЂР°С†РёСЋ СЂР°Р·РІРµСЂС‚С‹РІР°РЅРёСЏ РєР»СЋС‡Р°
 static void GOST_Kuz_F(const uint8_t* in_key_1, const uint8_t* in_key_2,
     uint8_t* out_key_1, uint8_t* out_key_2,
     uint8_t* iter_const)
@@ -215,23 +215,23 @@ static void GOST_Kuz_F(const uint8_t* in_key_1, const uint8_t* in_key_2,
     GOST_Kuz_X(internal, in_key_2, out_key_1);
 }
 
-vect iter_key[10]; // Итерационные ключи шифрования
+vect iter_key[10]; // РС‚РµСЂР°С†РёРѕРЅРЅС‹Рµ РєР»СЋС‡Рё С€РёС„СЂРѕРІР°РЅРёСЏ
 
-//непосредственное развертывание ключей
+//РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕРµ СЂР°Р·РІРµСЂС‚С‹РІР°РЅРёРµ РєР»СЋС‡РµР№
 void GOST_Kuz_Expand_Key(const uint8_t* key_1, const uint8_t* key_2)
 {
     int i;
 
-    // Предыдущая пара ключей
+    // РџСЂРµРґС‹РґСѓС‰Р°СЏ РїР°СЂР° РєР»СЋС‡РµР№
     uint8_t iter_1[64];
     uint8_t iter_2[64];
 
-    // Текущая пара ключей
+    // РўРµРєСѓС‰Р°СЏ РїР°СЂР° РєР»СЋС‡РµР№
     uint8_t iter_3[64];
     uint8_t iter_4[64];
-    GOST_Kuz_Get_C(); // Вычисляем итерационные константы
+    GOST_Kuz_Get_C(); // Р’С‹С‡РёСЃР»СЏРµРј РёС‚РµСЂР°С†РёРѕРЅРЅС‹Рµ РєРѕРЅСЃС‚Р°РЅС‚С‹
 
-    // Первые два итерационных ключа равны паре мастер-ключа
+    // РџРµСЂРІС‹Рµ РґРІР° РёС‚РµСЂР°С†РёРѕРЅРЅС‹С… РєР»СЋС‡Р° СЂР°РІРЅС‹ РїР°СЂРµ РјР°СЃС‚РµСЂ-РєР»СЋС‡Р°
     memcpy(iter_key[0], key_1, 64);
     memcpy(iter_key[1], key_2, 64);
     memcpy(iter_1, key_1, 64);
@@ -252,7 +252,7 @@ void GOST_Kuz_Expand_Key(const uint8_t* key_1, const uint8_t* key_2)
     }
 }
 
-//непосредственное шифрование (необходимо прежде запустить функцию GOST_Kuz_Expand_Key)
+//РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕРµ С€РёС„СЂРѕРІР°РЅРёРµ (РЅРµРѕР±С…РѕРґРёРјРѕ РїСЂРµР¶РґРµ Р·Р°РїСѓСЃС‚РёС‚СЊ С„СѓРЅРєС†РёСЋ GOST_Kuz_Expand_Key)
 void GOST_Kuz_Encript(const uint8_t* blk, uint8_t* out_blk)
 {
     int i;
@@ -267,7 +267,7 @@ void GOST_Kuz_Encript(const uint8_t* blk, uint8_t* out_blk)
     GOST_Kuz_X(out_blk, iter_key[9], out_blk);
 }
 
-//расшифровка (необходимо прежде запустить функцию GOST_Kuz_Expand_Key)
+//СЂР°СЃС€РёС„СЂРѕРІРєР° (РЅРµРѕР±С…РѕРґРёРјРѕ РїСЂРµР¶РґРµ Р·Р°РїСѓСЃС‚РёС‚СЊ С„СѓРЅРєС†РёСЋ GOST_Kuz_Expand_Key)
 void GOST_Kuz_Decript(const uint8_t* blk, uint8_t* out_blk)
 {
     int i;
